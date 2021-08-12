@@ -18,4 +18,22 @@ class PromocaoController {
     fun create(@RequestBody promocao: Promocao){
         promocoes[promocao.id] = promocao
     }
+
+    @RequestMapping(value = ["/promocoes/{id}"], method = arrayOf(RequestMethod.DELETE))
+    fun delete(@PathVariable id:Long){
+        promocoes.remove(id)
+    }
+
+    @RequestMapping(value = ["/promocoes/{id}"], method = arrayOf(RequestMethod.PUT))
+    fun update(@PathVariable id:Long, @RequestBody promocao: Promocao){
+        promocoes.remove(id)
+        promocoes[id] = promocao
+    }
+
+    @RequestMapping(value = ["/promocoes"], method = arrayOf(RequestMethod.GET))
+    fun getAll(@RequestParam(required = false, defaultValue = "") localFilter: String) =
+        promocoes.filter {
+            it.value.local.contains(localFilter, true)
+        }.map(Map.Entry<Long, Promocao>::value).toList()
+
 }
