@@ -1,5 +1,7 @@
 package com.acme.tour.controller
 
+import com.acme.tour.exception.PromocaoNotFoundException
+import com.acme.tour.model.ErrorMessage
 import com.acme.tour.model.Promocao
 import com.acme.tour.model.RespostaJson
 import com.acme.tour.service.PromocaoService
@@ -8,7 +10,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 @RestController
 @RequestMapping(value = ["/promocoes"]) //regra da url do controlador
@@ -18,11 +19,14 @@ class PromocaoController {
     lateinit var promocaoService: PromocaoService
 
     @GetMapping("{id}")
-    fun getById(@PathVariable id: Long): ResponseEntity<Promocao?> {
+    fun getById(@PathVariable id: Long): ResponseEntity<Any> {
         var promocao = this.promocaoService.getById(id)
-        var status = if(promocao != null) HttpStatus.OK else HttpStatus.NOT_FOUND
 
-        return ResponseEntity(promocao, status)
+        if(promocao != null) {
+            return ResponseEntity(promocao, HttpStatus.OK)
+        } else {
+            return ResponseEntity(ErrorMessage("Promoçao nao encontrada", "Promotion not found"), HttpStatus.NOT_FOUND)
+        }
     }
 
     @PostMapping
@@ -56,14 +60,13 @@ class PromocaoController {
     }
 
     @GetMapping
-    fun getAll(@RequestParam(required = false, defaultValue = "") localFilter: String): ResponseEntity<List<Promocao?>>{
-        var status = HttpStatus.NOT_FOUND
-        val local = this.promocaoService.searchByLocal(localFilter)
-        if(local.size != 0){
-           status = HttpStatus.ACCEPTED
-        }
+    fun getAll(@RequestParam(required = false, defaultValue = "0") start: Int,
+               @RequestParam(required = false, defaultValue = "3") size: Int): ResponseEntity<List<Promocao?>>{
 
-        return ResponseEntity(local, status)
+        val list = this.promocaoService.getAll(start, size)
+        val status = if(list.size == 0) HttpStatus.NOT_FOUND else HttpStatus.OK
+
+        return ResponseEntity(list, status)
     }
 
 }

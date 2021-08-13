@@ -1,44 +1,38 @@
 package com.acme.tour.service.impl
 
 import com.acme.tour.model.Promocao
+import com.acme.tour.repository.PromocaoRepository
 import com.acme.tour.service.PromocaoService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
-class PromocaoServiceimpl: PromocaoService {
-
-    companion object{
-        val initialPromocoes = arrayOf(
-            Promocao(1, "cidade maravilhosa", "Rio de Janeiro", true, 7, 2200.00),
-            Promocao(2, "friozinho dos bom", "Gramados", true, 2, 1400.00),
-            Promocao(3, "a cidade fotogenica", "Tokyo", false, 7, 12200.00),
-            Promocao(4, "cidade do sol", "Teresina", true, 3, 1500.00),
-        )
-    }
-
-    var promocoes = ConcurrentHashMap<Long, Promocao>(initialPromocoes.associateBy(Promocao::id))
+class PromocaoServiceimpl(val promocaoRepository: PromocaoRepository): PromocaoService {
 
     override fun create(promocao: Promocao) {
-        promocoes[promocao.id] = promocao
+        this.promocaoRepository.save(promocao)
     }
 
     override fun getById(id: Long): Promocao? {
-        return promocoes[id]
+        return this.promocaoRepository.findById(id).orElseGet(null)
     }
 
     override fun delete(id: Long) {
-        promocoes.remove(id)
+        this.promocaoRepository.deleteById(id)
     }
 
     override fun update(id: Long, promocao: Promocao) {
-        promocoes.remove(id)
         create(promocao)
     }
 
-    override fun searchByLocal(local: String) =
-         promocoes.filter {
-            it.value.local.contains(local, true)
-        }.map(Map.Entry<Long, Promocao>::value).toList()
+    override fun searchByLocal(local: String): List<Promocao> = listOf()
+
+    override fun getAll(start: Int, size: Int): List<Promocao> {
+        val pages: Pageable = PageRequest.of(start, size)
+        return this.promocaoRepository.findAll(pages).toList()
+    }
 
 }
