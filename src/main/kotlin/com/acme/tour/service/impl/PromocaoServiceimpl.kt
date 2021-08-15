@@ -35,4 +35,8 @@ class PromocaoServiceimpl(val promocaoRepository: PromocaoRepository): PromocaoS
         return this.promocaoRepository.findAll(pages).toList()
     }
 
+    override fun getPromo(preco: Double): List<Promocao> {
+        return this.promocaoRepository.getPromoLess9k(preco)
+    }
+
 }

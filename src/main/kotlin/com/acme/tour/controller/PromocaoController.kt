@@ -69,4 +69,7 @@ class PromocaoController {
         return ResponseEntity(list, status)
     }
 
+    @GetMapping("/search/{preco}")
+    fun getPromoBySearch(@PathVariable preco: Double) = this.promocaoService.getPromo(preco)
+
 }

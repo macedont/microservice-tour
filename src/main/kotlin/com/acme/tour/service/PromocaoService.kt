@@ -9,4 +9,5 @@ interface PromocaoService {
     fun update(id: Long, promocao: Promocao)
     fun searchByLocal(local: String): List<Promocao>
     fun getAll(start: Int, size: Int): List<Promocao>
+    fun getPromo(preco: Double): List<Promocao>
 }
