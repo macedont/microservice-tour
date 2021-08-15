@@ -61,7 +61,7 @@ class PromocaoController {
 
     @GetMapping
     fun getAll(@RequestParam(required = false, defaultValue = "0") start: Int,
-               @RequestParam(required = false, defaultValue = "3") size: Int): ResponseEntity<List<Promocao?>>{
+               @RequestParam(required = false, defaultValue = "10") size: Int): ResponseEntity<List<Promocao?>>{
 
         val list = this.promocaoService.getAll(start, size)
         val status = if(list.size == 0) HttpStatus.NOT_FOUND else HttpStatus.OK
